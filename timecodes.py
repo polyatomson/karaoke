@@ -11,7 +11,7 @@ class Track:
         return  self.artist + '\t' + self.song + '\t' + self.link
 
 
-with open('karaoke.txt', 'r', encoding='utf-8') as f:
+with open('karaoke2.txt', 'r', encoding='utf-8') as f:
     dat = f.readlines()
     common_link = dat[0].strip()
     dat = dat[1:]
@@ -25,17 +25,19 @@ def convert_minutes_to_seconds(minutes: str):
         hours, minutes, seconds = splitted
         return int(hours)*3600 + int(minutes)*60 + int(seconds)
 
+# res = convert_minutes_to_seconds('45:23')    
+
 tracks = list()
 for line in dat:
     parsed = re.search('([0-9:]+? )(.+)', line)
     time = parsed.group(1).strip(' ')
     time_seconds = convert_minutes_to_seconds(time)
     name = parsed.group(2).strip()
-    song, artist = name.rsplit(', ', 1)
+    artist, song = name.rsplit('-', 1)
     link = common_link + str(time_seconds)
     tracks.append(Track(link, song, artist))
 
-with open('catalogue.tsv', 'a', encoding='utf-8') as f:
+with open('catalogue2.tsv', 'a', encoding='utf-8') as f:
     for track in tracks:
         f.write(track.to_tsv_line() + '\n')
 
