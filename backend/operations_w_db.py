@@ -16,8 +16,9 @@ def get_table() -> dict:
                    WHERE in_use=1 
                    ORDER BY origin, artist, title ASC
                    """)
+    songs = cursor.fetchall()
     conn.close()
-    return {'songs':cursor.fetchall()}
+    return {'songs':songs}
 
 def record_view(song_id: int) -> str:
     conn = mysql.connector.connect(**config)
@@ -28,9 +29,9 @@ def record_view(song_id: int) -> str:
     cursor.execute("""SELECT n_views FROM Views WHERE song_id=%s""", (song_id, ))
     n_views = cursor.fetchone()[0]
     conn.close()
-    return 'view recorded'
+    return f'view recorded, {n_views} total'
     
-# res = get_table()
+res = get_table()
 # print()
 # {'song_id': 13, 'title': 'Ne moren bez nje', 'artist': 'Alen Vitasović', 'vocals': None, 'in_use': 1, 'origin': 'EX-YU', 'link': 'https://www.youtube....YPTH9IxqpY'}
-record_view(1)
+# record_view(1)

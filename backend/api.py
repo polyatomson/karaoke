@@ -1,12 +1,18 @@
 from flask import Flask, request, jsonify
 import os
+from operations_w_db import get_table, record_view
 app = Flask(__name__)
 
 @app.route('/catalog', methods=['GET'])
 def get_catalog():
     if request.method == 'GET':
-        return 'ok'
-    
+        return get_table()
+
+@app.route('/view', methods=['POST'])
+def send_view_to_db():
+    if request.method=='POST':
+        song_id = request.get_json()["song_id"]
+        return record_view(song_id)
 
 @app.after_request
 def add_headers(response):
