@@ -13,7 +13,12 @@ class Song:
     origin: str
     in_use: bool
     voice: Optional[bool]
+    id: Optional[int]
     views: int = 0
+
+    def to_tuple(self) -> tuple:
+        # song_id, title, artist, vocals, in_use, origin, link
+        return self.id, self.song, self.artist, self.voice, self.in_use, self.origin, self.link
 
 
 config = {'user': os.environ['DB_USER'],
@@ -34,13 +39,14 @@ def import_sheet(fp: str='backend/google_sheet.tsv') -> list[Song]:
         
         artist, song, link, origin, in_use, voice = line.split('\t')[1:]
         in_use = True if in_use == '' else False
+        voice = voice.strip()
         if voice == 'w_voice':
             voice = True
         elif voice == 'no_voice':
             voice = False
-        else:
+        elif voice== '':
             voice = None
-        songs.append(Song(song=song, artist=artist, link=link, origin=origin, in_use=in_use, voice=voice))
+        songs.append(Song(song=song, artist=artist, link=link, origin=origin, in_use=in_use, voice=voice, id=None))
     return songs
 
 def create_schema():
@@ -49,8 +55,8 @@ def create_schema():
     try:
         cursor.execute("""
                     CREATE TABLE `Songs` (
-                    `title` varchar(500) NOT NULL,
                     `song_id` int(11) NOT NULL AUTO_INCREMENT,
+                    `title` varchar(500) NOT NULL,
                     `artist` varchar(500) NOT NULL DEFAULT 'Unknown',
                     `vocals` tinyint(1) DEFAULT NULL,
                     `in_use` tinyint(1) NOT NULL DEFAULT '1',
@@ -60,6 +66,7 @@ def create_schema():
                     UNIQUE KEY `Songs_UN_link` (`link`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
                     """)
+        conn.commit()
         print('created table Songs')
     except Exception as ex:
         if ex.errno != 1050:
@@ -76,6 +83,7 @@ def create_schema():
                     CONSTRAINT `Views_FK` FOREIGN KEY (`song_id`) REFERENCES `Songs` (`song_id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
                     """)
+        conn.commit()
         print('created table Views')
     except Exception as ex:
         if ex.errno != 1050:
@@ -83,10 +91,32 @@ def create_schema():
     conn.close()
     print()
 
+def fill_empty_db(data: list[Song]):
+    data = [song.to_tuple() for song in data]
+    insert_query = """
+    INSERT INTO Songs(song_id, title, artist, vocals, in_use, origin, link) 
+    VALUES(%s, %s, %s, %s, %s, %s, %s)
+    ON DUPLICATE KEY UPDATE song_id=song_id
+;"""
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.executemany(insert_query, data)
+        conn.commit()
+    except Exception as ex:
+        if ex.errno == 1062:
+            print('some duplicates prevented batch fill\n', ex.msg)
+        else:
+            raise(ex)
+    conn.close()
+    print()
+
+
 
 def main():
-    import_sheet()
+    data = import_sheet()
     create_schema()
+    fill_empty_db(data)
 
 if __name__ == '__main__':
     main()

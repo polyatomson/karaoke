@@ -16,3 +16,6 @@ CREATE TABLE IF NOT EXISTS `Views` (
   UNIQUE KEY `Views_UN` (`song_id`),
   CONSTRAINT `Views_FK` FOREIGN KEY (`song_id`) REFERENCES `Songs` (`song_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO Songs(song_id, title, artist, vocals, in_use, origin, link) 
+VALUES(%s, %s, %s, %s, %s, %s, %s);
