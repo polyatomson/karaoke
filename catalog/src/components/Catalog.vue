@@ -35,9 +35,9 @@
     </Card>
 </template>
 <script setup>
-import { onBeforeMount, onMounted, ref, watch } from 'vue'
+import { onBeforeMount, onBeforeUnmount, onBeforeUpdate, onMounted, ref, watch } from 'vue'
 const songs = ref()
-const viewed = ref([])
+const viewed = ref()
 const mobile = ref()
 const scrollH = ref()
 
@@ -116,6 +116,16 @@ onBeforeMount(() => {
     const windHeight = window.innerHeight
     scrollH.value = windHeight.toString() + 'px'
     console.log(scrollH.value)
+    const visited = localStorage.getItem('visited')
+    console.log('visited', visited, typeof(visited))
+    if (visited != 'undefined') {
+        viewed.value = JSON.parse(visited)
+    }
+    else {
+        viewed.value = []
+    }
+    console.log(viewed.value)
+    console.log(scrollH.value)
 })
 
 onMounted(async () => {
@@ -131,4 +141,19 @@ onMounted(async () => {
 })
 }
 )
+
+// onBeforeUnmount(() => {
+//     console.log('before update', viewed.value)
+//     localStorage.setItem('visited', JSON.stringify(viewed.value))
+// })
+
+window.addEventListener('beforeunload', (event) => {
+        // Cancel the event as stated by the standard.
+        // event.preventDefault();
+        console.log('before leaving', viewed.value)
+        localStorage.setItem('visited', JSON.stringify(viewed.value))
+        // Chrome requires returnValue to be set.
+        event.returnValue = '';
+      });
+
 </script>
