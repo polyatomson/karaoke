@@ -3,7 +3,7 @@ import json
 from dataclasses import dataclass
 from typing import Optional
 import os
-
+import re
 
 @dataclass
 class Song:
@@ -19,7 +19,12 @@ class Song:
     def to_tuple(self) -> tuple:
         # song_id, title, artist, vocals, in_use, origin, link
         return self.id, self.song, self.artist, self.voice, self.in_use, self.origin, self.link
-
+    
+    # def clean_link(self) -> None:
+    #     if 'watch?v=' in self.link:
+    #         video_id = re.search(r'watch\?v=(.+)').group()
+    #     elif ''
+        
 
 config = {'user': os.environ['DB_USER'],
   'password': os.environ['DB_PASSWORD'],
@@ -28,7 +33,6 @@ config = {'user': os.environ['DB_USER'],
   'database': os.environ['DATABASE'],
   'raise_on_warnings': True
 }
-
 
 def import_sheet(fp: str='backend/google_sheet.tsv') -> list[Song]:
     with open(fp, 'r', encoding='utf-8') as f:
@@ -91,15 +95,17 @@ def create_schema():
     conn.close()
     print()
 
-def fill_empty_db(data: list[Song]):
+def fill_db(data: list[Song]):
     data = [song.to_tuple() for song in data]
     insert_query = """
     INSERT INTO Songs(song_id, title, artist, vocals, in_use, origin, link) 
     VALUES(%s, %s, %s, %s, %s, %s, %s)
-    ON DUPLICATE KEY UPDATE song_id=song_id
-;"""
+    ON DUPLICATE KEY UPDATE song_id=song_id;
+    """
     conn = mysql.connector.connect(**config)
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(song_id) FROM Songs")
+    n_songs_before= cursor.fetchone()[0]
     try:
         cursor.executemany(insert_query, data)
         conn.commit()
@@ -108,7 +114,10 @@ def fill_empty_db(data: list[Song]):
             print('some duplicates prevented batch fill\n', ex.msg)
         else:
             raise(ex)
+    cursor.execute("SELECT COUNT(song_id) FROM Songs")
+    n_songs_after= cursor.fetchone()[0]
     conn.close()
+    print('DB extended by', n_songs_after-n_songs_before, 'songs')
     print()
 
 
@@ -116,7 +125,7 @@ def fill_empty_db(data: list[Song]):
 def main():
     data = import_sheet()
     create_schema()
-    fill_empty_db(data)
+    fill_db(data)
 
 if __name__ == '__main__':
     main()
