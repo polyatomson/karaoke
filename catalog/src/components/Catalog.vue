@@ -2,20 +2,20 @@
     <div class="flex justify-content-center">
         <Button label="Reload" @click="getCatalog"/>
     </div>
-    <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
+    <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{root: {style: 'width: 100vw;'}, header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
         <template #header>
             <div style="height: 1rem;"></div>
         </template>
         <template #content>
-            <DataTable :value="songs" size="small" scrollable scrollHeight="300rem">
+            <DataTable :value="songs" size="small" :pt="{root: {style: 'width: 95vw;'}}" scrollable scrollHeight="300rem">
                 <Column field="origin" header="Origin">
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
                 </Column>
-                <Column field="artist" style="max-width: 5rem;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
-                <Column field="title" style="max-width: 5rem;" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
-                <Column field="link" header="Link">
+                <Column field="artist" style="max-width: 30vw;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
+                <Column field="title" style="max-width: 50vw;" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
+                <Column field="link" style="max-width: 10vw;" header="Link">
                 <template #body="{ data, field }">
                 <a :href="data[field]" target="_blank">
                     <Button v-if="!viewed.includes(data.song_id)" label="Open" class="text-sm" size="small" severity="info" @click="addView(data.song_id)"/>
@@ -23,7 +23,7 @@
                 </a>
                 </template>
                 </Column>
-                <Column field="vocals" header="Voice">
+                <Column field="vocals" style="max-width: 10vw" header="Voice">
                     <template #body="{ data, field}">
                         <i v-if="data[field]===1" class="pi pi-check" style="font-size: 1rem"></i>
                         <i v-if="data[field]===0" class="pi pi-times" style="font-size: 1rem"></i>
