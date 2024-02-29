@@ -23,7 +23,9 @@
                 </Column>
                 <Column field="link" header="Link">
                 <template #body="{ data, field }">
-                
+                <a :href="data[field]" target="_blank">
+                    <Button label="Open" severity="info" @click="addView(data.song_id)"/>
+                </a>
                 </template>
                 </Column>
             </DataTable>
@@ -65,17 +67,27 @@ async function getCatalog() {
     const received = await response.json();
     songs.value = received.songs;
     console.log('songs recieved, example:', received.songs[0])
-    localStorage.setItem("songs", JSON.stringify(received.songs));
 }
+
+async function addView(song_id) {
+    console.log('adding view for', song_id)
+    const response = await fetch(
+          'http://localhost:7000/view', 
+          {
+            mode: 'cors',
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({'song_id': song_id})
+          })
+    reply = await response.text();
+    console.log(reply)
+    
+}
+
 onMounted(async () => {
-    const loadedSongs = localStorage.getItem('songs')
-    if (loadedSongs === null) {
-        getCatalog()
-    }
-    else {
-        console.log('already in storage')
-        songs.value = JSON.parse(loadedSongs)
-    }
+    getCatalog()
 }
 )
 </script>
