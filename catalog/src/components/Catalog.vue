@@ -7,14 +7,14 @@
             <div style="height: 1rem;"></div>
         </template>
         <template #content>
-            <DataTable :value="songs" size="small" :pt="{wrapper: {style: tableWidth+'overflow-x: hidden;'}, table: {style: tableWidth}}" scrollable scrollHeight="300rem">
-                <Column field="origin" style="max-width: 15%;" header="Origin">
+            <DataTable :value="songs" size="small" :pt="{wrapper: {style: tableWidth}, virtualScroller:{autoSize: true}, table: {style: tableWidth}}" scrollable scrollHeight="300rem">
+                <Column field="origin" style="max-width: 10%;" header="Origin">
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
                 </Column>
-                <Column field="artist" style="max-width: 25%;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
-                <Column field="title" style="max-width: 40%;" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
+                <Column field="artist" style="max-width: 20%;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
+                <Column field="title" style="max-width: 35%;" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
                 <Column field="link" style="max-width: 10%;" header="Link">
                 <template #body="{ data, field }">
                 <a :href="data[field]" target="_blank" rel="noopener noreferrer">
