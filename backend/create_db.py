@@ -122,10 +122,12 @@ def fill_db(data: list[Song]):
 
 
 
+
 def main():
     data = import_sheet()
     create_schema()
     fill_db(data)
+
 
 if __name__ == '__main__':
     main()

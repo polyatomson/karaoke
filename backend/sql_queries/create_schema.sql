@@ -20,3 +20,4 @@ CREATE TABLE IF NOT EXISTS `Views` (
 INSERT INTO Songs(song_id, title, artist, vocals, in_use, origin, link) 
     VALUES(%s, %s, %s, %s, %s, %s, %s)
     ON DUPLICATE KEY UPDATE song_id=song_id;
+
