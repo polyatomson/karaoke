@@ -118,7 +118,7 @@ onBeforeMount(() => {
     console.log(scrollH.value)
     const visited = localStorage.getItem('visited')
     console.log('visited', visited, typeof(visited))
-    if (visited != 'undefined') {
+    if (visited != 'undefined' && visited != 'null') {
         viewed.value = JSON.parse(visited)
     }
     else {
