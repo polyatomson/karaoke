@@ -1,2 +1,3 @@
 import os
-print(os.environ['HOME'])
+env = os.environ['DATABASE']
+print()

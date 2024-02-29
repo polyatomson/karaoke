@@ -13,3 +13,6 @@ def add_headers(response):
     response.headers.add('Access-Control-Allow-Origin', os.environ['UI_SERVER'])
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     return response
+
+if __name__ == '__main__':
+    app.run("localhost", os.environ['API_SERVER'])
