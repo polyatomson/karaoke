@@ -1,13 +1,14 @@
 <template>
     <div class="flex justify-content-center">
-        <Button label="Reload" @click="getCatalog"/>
+        <!-- <Button label="Reload" @click="getCatalog"/> -->
+        <SelectButton v-if="mobile" v-model="selectedOrigin" :options="origins"/>
     </div>
     <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
         <template #header>
             <div style="height: 1rem;"></div>
         </template>
         <template #content>
-            <DataTable :value="songs" size="small" scrollable scrollHeight="300rem">
+            <DataTable :value="songsFromOrigin" size="small" scrollable :scrollHeight="scrollH">
                 <Column v-if="!mobile" field="origin" style="max-width: 10rem;" header="Origin">
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
@@ -34,10 +35,26 @@
     </Card>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onBeforeMount, onMounted, ref, watch } from 'vue'
 const songs = ref()
 const viewed = ref([])
 const mobile = ref()
+const scrollH = ref()
+
+const origins = ref(['SLO', 'EX-YU', 'Foreign'])
+const selectedOrigin = ref('SLO')
+const songsFromOrigin = ref()
+
+watch(selectedOrigin, async(newOrigin) => {
+    console.log('watch works', newOrigin)
+    pickOrigin(selectedOrigin.value)
+}
+)
+
+
+const pickOrigin = (pickedOrigin) => {
+    songsFromOrigin.value = songs.value.filter(song => song.origin === pickedOrigin)
+}
 
 const getColor = (origin) => {
     switch (origin) {
@@ -95,11 +112,23 @@ const detectMob = () => {
     return ( ( window.outerWidth <= 500 ) );
   }
 
+onBeforeMount(() => {
+    const windHeight = window.innerHeight
+    scrollH.value = windHeight.toString() + 'px'
+    console.log(scrollH.value)
+})
+
 onMounted(async () => {
+    getCatalog().then( () => {
     if (detectMob()) {
         mobile.value = true
+        pickOrigin('SLO')
     }
-    getCatalog()
+    else {
+        mobile.value = false
+        songsFromOrigin.value = songs.value
+    }
+})
 }
 )
 </script>

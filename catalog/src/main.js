@@ -13,6 +13,8 @@ import Tag from 'primevue/tag';
 import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
 import Card from 'primevue/card';
+import SelectButton from 'primevue/selectbutton';
+
 
 import Catalog from './components/Catalog.vue';
 
@@ -28,6 +30,7 @@ app.component('InputText', InputText);
 app.component('Dropdown', Dropdown);
 app.component('Tag', Tag)
 app.component('Card', Card)
+app.component('SelectButton', SelectButton)
 
 app.component('Catalog', Catalog)
 
