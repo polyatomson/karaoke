@@ -15,6 +15,8 @@ import Dropdown from 'primevue/dropdown';
 import Card from 'primevue/card';
 import SelectButton from 'primevue/selectbutton';
 
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 
 import Catalog from './components/Catalog.vue';
 
@@ -31,6 +33,9 @@ app.component('Dropdown', Dropdown);
 app.component('Tag', Tag)
 app.component('Card', Card)
 app.component('SelectButton', SelectButton)
+
+app.component('IconField', IconField)
+app.component('InputIcon', InputIcon)
 
 app.component('Catalog', Catalog)
 

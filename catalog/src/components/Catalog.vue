@@ -8,14 +8,46 @@
             <div style="height: 1rem;"></div>
         </template>
         <template #content>
-            <DataTable :value="songsFromOrigin" size="small" scrollable :scrollHeight="scrollH">
+            <DataTable :value="songsFromOrigin" size="small" scrollable :scrollHeight="scrollH"
+            sortMode="multiple" v-model:filters="filters" 
+            filterDisplay="row"
+            :globalFilterFields="['artist', 'title']"
+            >
+
+            <template #header>
+                <div class="flex justify-content-end">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+                    </span>
+                </div>
+            </template>
+
+
+
                 <Column v-if="!mobile" field="origin" style="max-width: 10rem;" header="Origin">
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <Dropdown v-model="filterModel.value" 
+                        @change="filterCallback()"
+                        :options="origins"
+                        class="p-column-filter" style="min-width: 12rem"
+                        placeholder="Choose"
+                        />
+                    </template>
                 </Column>
-                <Column field="artist" style="max-width: 8rem;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
-                <Column field="title" style="max-width: 8rem" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
+                <Column field="artist" style="max-width: 8rem;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist">
+                    <template v-if="mobile" #filter="{ filterModel, filterCallback }">
+                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Search" />
+                    </template>
+                </Column>
+                <Column field="title" style="max-width: 8rem" :pt="{body: {class: 'flex flex-wrap'}}" header="Title">
+                    <template v-if="mobile" #filter="{ filterModel, filterCallback }">
+                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Search" />
+                    </template>
+                </Column>
                 <Column v-if="!mobile" field="vocals" style="max-width: 10%" header="Voice">
                     <template #body="{ data, field}">
                         <i v-if="data[field]===1" class="pi pi-check" style="font-size: 1rem"></i>
@@ -36,6 +68,8 @@
 </template>
 <script setup>
 import { onBeforeMount, onBeforeUnmount, onBeforeUpdate, onMounted, ref, watch } from 'vue'
+import { FilterMatchMode } from 'primevue/api';
+
 const songs = ref()
 const viewed = ref()
 const mobile = ref()
@@ -44,6 +78,16 @@ const scrollH = ref()
 const origins = ref(['SLO', 'EX-YU', 'Foreign'])
 const selectedOrigin = ref('SLO')
 const songsFromOrigin = ref()
+
+
+
+const filters = ref({
+                artist: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                title: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                origin: { value: null, matchMode: FilterMatchMode.EQUALS },
+                global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            })
+
 
 watch(selectedOrigin, async(newOrigin) => {
     console.log('watch works', newOrigin)
