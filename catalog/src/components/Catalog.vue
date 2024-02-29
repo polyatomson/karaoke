@@ -2,28 +2,28 @@
     <div class="flex justify-content-center">
         <Button label="Reload" @click="getCatalog"/>
     </div>
-    <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{root: {style: 'width: 100vw;'}, header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
+    <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{root: {style: tableWidth}, header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
         <template #header>
             <div style="height: 1rem;"></div>
         </template>
         <template #content>
-            <DataTable :value="songs" size="small" :pt="{root: {style: 'width: 95vw;'}}" scrollable scrollHeight="300rem">
-                <Column field="origin" header="Origin">
+            <DataTable :value="songs" size="small" :pt="{wrapper: {style: tableWidth+'overflow-x: hidden;'}, table: {style: tableWidth}}" scrollable scrollHeight="300rem">
+                <Column field="origin" style="max-width: 15%;" header="Origin">
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
                 </Column>
-                <Column field="artist" style="max-width: 30vw;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
-                <Column field="title" style="max-width: 50vw;" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
-                <Column field="link" style="max-width: 10vw;" header="Link">
+                <Column field="artist" style="max-width: 25%;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist"></Column>
+                <Column field="title" style="max-width: 40%;" :pt="{body: {class: 'flex flex-wrap'}}" header="Title"></Column>
+                <Column field="link" style="max-width: 10%;" header="Link">
                 <template #body="{ data, field }">
-                <a :href="data[field]" target="_blank">
+                <a :href="data[field]" target="_blank" rel="noopener noreferrer">
                     <Button v-if="!viewed.includes(data.song_id)" label="Open" class="text-sm" size="small" severity="info" @click="addView(data.song_id)"/>
                     <Button v-else="viewed.includes(data.song_id)" label="Repeat" class="text-sm" size="small" severity="warning" @click="addView(data.song_id)"/>
                 </a>
                 </template>
                 </Column>
-                <Column field="vocals" style="max-width: 10vw" header="Voice">
+                <Column field="vocals" style="max-width: 10%" header="Voice">
                     <template #body="{ data, field}">
                         <i v-if="data[field]===1" class="pi pi-check" style="font-size: 1rem"></i>
                         <i v-if="data[field]===0" class="pi pi-times" style="font-size: 1rem"></i>
@@ -37,6 +37,7 @@
 import { onMounted, ref } from 'vue'
 const songs = ref()
 const viewed = ref([])
+const tableWidth = ref()
 
 const getColor = (origin) => {
     switch (origin) {
@@ -90,7 +91,18 @@ async function addView(song_id) {
     
 }
 
+const detectMob = () => {
+    return ( ( window.outerWidth <= 500 ) );
+  }
 onMounted(async () => {
+    if (detectMob()) {
+        tableWidth.value = "width:" + window.outerWidth.toString() + "px;"
+    }
+    else {
+        tableWidth.value = "width: 100%;"
+    }
+    console.log('table width', tableWidth.value)
+    // console.log(window.outerWidth)
     getCatalog()
 }
 )
