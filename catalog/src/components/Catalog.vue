@@ -16,16 +16,16 @@
 
             <template #header>
                 <div class="flex justify-content-end">
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search" />
+                    <IconField>
+                    <InputIcon class="pi pi-search"> </InputIcon>
                         <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                    </span>
+                    </IconField>
                 </div>
             </template>
 
 
 
-                <Column v-if="!mobile" field="origin" style="max-width: 10rem;" header="Origin">
+                <Column v-if="!mobile" field="origin" style="max-width: 10rem;" header="Origin" sortable>
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
@@ -38,17 +38,17 @@
                         />
                     </template>
                 </Column>
-                <Column field="artist" style="max-width: 8rem;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist">
-                    <template v-if="mobile" #filter="{ filterModel, filterCallback }">
+                <Column field="artist" style="max-width: 8rem;" :pt="{body: {class: 'flex flex-wrap'}}" header="Artist" sortable>
+                    <template v-if="!mobile" #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Search" />
                     </template>
                 </Column>
-                <Column field="title" style="max-width: 8rem" :pt="{body: {class: 'flex flex-wrap'}}" header="Title">
-                    <template v-if="mobile" #filter="{ filterModel, filterCallback }">
+                <Column field="title" style="max-width: 8rem" :pt="{body: {class: 'flex flex-wrap'}}" header="Title" sortable>
+                    <template v-if="!mobile" #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Search" />
                     </template>
                 </Column>
-                <Column v-if="!mobile" field="vocals" style="max-width: 10%" header="Voice">
+                <Column v-if="!mobile" field="vocals" style="max-width: 10%" header="Voice" sortable>
                     <template #body="{ data, field}">
                         <i v-if="data[field]===1" class="pi pi-check" style="font-size: 1rem"></i>
                         <i v-if="data[field]===0" class="pi pi-times" style="font-size: 1rem"></i>
