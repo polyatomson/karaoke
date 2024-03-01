@@ -153,7 +153,8 @@ async function addView(song_id) {
 }
 
 const detectMob = () => {
-    return ( ( window.outerWidth <= 500 ) );
+    console.log(window.innerWidth)
+    return ( ( window.innerWidth <= 500 ) );
   }
 
 onBeforeMount(() => {
