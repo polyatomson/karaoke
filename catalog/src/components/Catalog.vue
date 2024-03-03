@@ -57,8 +57,8 @@
                 <Column field="link" style="max-width: 10rem;" frozen alignFrozen="right" header="Link">
                 <template #body="{ data, field }">
                 <a :href="data[field]" target="_blank" rel="noopener noreferrer">
-                    <Button v-if="!viewed.includes(data.song_id)" label="Open" class="text-sm" size="small" severity="info" @click="addView(data.song_id)"/>
-                    <Button v-else="viewed.includes(data.song_id)" label="Repeat" class="text-sm" size="small" severity="warning" @click="addView(data.song_id)"/>
+                    <Button v-if="mobile" icon="pi pi-external-link" size="small" :severity="visitedColor(data)" @click="addView(data.song_id)"/>
+                    <Button v-else label="Open" class="text-sm" icon="pi pi-external-link" size="small" :severity="visitedColor(data)" @click="addView(data.song_id)"/>
                 </a>
                 </template>
                 </Column>
@@ -74,6 +74,17 @@ const songs = ref()
 const viewed = ref()
 const mobile = ref()
 const scrollH = ref()
+
+
+
+const visitedColor = (data) => {
+    if (viewed.value.includes(data.song_id)) {
+        return 'info'
+    }
+    else {
+        return 'warning'
+    }
+}
 
 const origins = ref(['SLO', 'EX-YU', 'Foreign'])
 const selectedOrigin = ref('SLO')
