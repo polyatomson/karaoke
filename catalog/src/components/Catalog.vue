@@ -143,7 +143,7 @@ async function addView(song_id) {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({'song_id': song_id})
+            body: JSON.stringify({song_id})
           })
     const reply = await response.text();
     console.log(reply)
@@ -188,10 +188,6 @@ onMounted(async () => {
 }
 )
 
-// onBeforeUnmount(() => {
-//     console.log('before update', viewed.value)
-//     localStorage.setItem('visited', JSON.stringify(viewed.value))
-// })
 
 window.addEventListener('beforeunload', (event) => {
         // Cancel the event as stated by the standard.
