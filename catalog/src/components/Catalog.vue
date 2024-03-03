@@ -82,6 +82,8 @@ const scrollH = ref()
 
 const favs = ref()
 
+
+
 const favoriteFill = (data) => {
     if (favs.value.includes(data.song_id)) {
         return 'pi pi-heart-fill'
@@ -155,7 +157,7 @@ const getColor = (origin) => {
 async function getCatalog() {
     console.log('making GET query')
     const response = await fetch(
-          'http://localhost:7000/catalog', 
+        import.meta.env.VITE_APP_API_URL + '/catalog', 
           {
             mode: 'cors',
             method: 'GET',
@@ -171,7 +173,7 @@ async function getCatalog() {
 async function addView(song_id) {
     console.log('adding view for', song_id)
     const response = await fetch(
-          'http://localhost:7000/view', 
+        import.meta.env.VITE_APP_API_URL+'/view', 
           {
             mode: 'cors',
             method: 'POST',
