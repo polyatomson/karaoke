@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-content-center">
         <!-- <Button label="Reload" @click="getCatalog"/> -->
-        <SelectButton v-if="mobile" v-model="selectedOrigin" :options="origins"/>
+        <SelectButton v-if="mobile" v-model="selectedOrigin" :options="origins" :allowEmpty="false"/>
     </div>
     <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
         <template #header>
@@ -162,9 +162,10 @@ onBeforeMount(() => {
     scrollH.value = windHeight.toString() + 'px'
     console.log(scrollH.value)
     const visited = localStorage.getItem('visited')
-    console.log('visited', visited, typeof(visited))
-    if (visited != 'undefined' && visited != 'null') {
+    console.log('visited', visited)
+    if (visited != 'undefined' && visited != null) {
         viewed.value = JSON.parse(visited)
+
     }
     else {
         viewed.value = []
