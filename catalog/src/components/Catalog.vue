@@ -54,6 +54,11 @@
                         <i v-if="data[field]===0" class="pi pi-times" style="font-size: 1rem"></i>
                         </template>
                 </Column>
+                <Column style="max-width: 10rem;" frozen alignFrozen="right">
+                <template #body="{ data }">
+                    <Button :icon="favoriteFill(data)" size="small" severity="error" @click="Like(data)"/>
+                </template>
+                </Column>
                 <Column field="link" style="max-width: 10rem;" frozen alignFrozen="right" header="Link">
                 <template #body="{ data, field }">
                 <a :href="data[field]" target="_blank" rel="noopener noreferrer">
@@ -75,7 +80,26 @@ const viewed = ref()
 const mobile = ref()
 const scrollH = ref()
 
+const favs = ref()
 
+const favoriteFill = (data) => {
+    if (favs.value.includes(data.song_id)) {
+        return 'pi pi-heart-fill'
+    }
+    else {
+        return 'pi pi-heart'
+    }
+}
+
+const Like = (data) => {
+    const song_id = data.song_id
+    if (favs.value.includes(song_id)) {
+        favs.value = favs.value.filter((id) => id !== song_id)
+    }
+    else {
+        favs.value.push(song_id)
+    }
+}
 
 const visitedColor = (data) => {
     if (viewed.value.includes(data.song_id)) {
@@ -172,6 +196,16 @@ onBeforeMount(() => {
     const windHeight = window.innerHeight
     scrollH.value = windHeight.toString() + 'px'
     console.log(scrollH.value)
+    
+    const favourites = localStorage.getItem('favourites')
+    console.log('favorites', favourites)
+    if (favourites != 'undefined' && favourites != null) {
+        favs.value = JSON.parse(favourites)
+
+    }
+    else {
+        favs.value = []
+    }
     const visited = localStorage.getItem('visited')
     console.log('visited', visited)
     if (visited != 'undefined' && visited != null) {
@@ -205,6 +239,7 @@ window.addEventListener('beforeunload', (event) => {
         // event.preventDefault();
         console.log('before leaving', viewed.value)
         localStorage.setItem('visited', JSON.stringify(viewed.value))
+        localStorage.setItem('favourites', JSON.stringify(favs.value))
         // Chrome requires returnValue to be set.
         event.returnValue = '';
       });
