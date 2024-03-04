@@ -103,10 +103,10 @@ const Like = (data) => {
 
 const visitedColor = (data) => {
     if (viewed.value.includes(data.song_id)) {
-        return 'info'
+        return 'warning'
     }
     else {
-        return 'warning'
+        return 'info'
     }
 }
 
