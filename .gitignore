@@ -2,3 +2,4 @@
 backend/.myenv
 *.pyc
 .htaccess
+commands

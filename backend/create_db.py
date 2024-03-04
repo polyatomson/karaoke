@@ -5,6 +5,8 @@ from typing import Optional
 import os
 import re
 
+from yt_url_parser import get_id_w_timestamp
+
 @dataclass
 class Song:
     song: str
@@ -42,6 +44,7 @@ def import_sheet(fp: str='backend/google_sheet.tsv') -> list[Song]:
     for line in sheet:
         
         artist, song, link, origin, in_use, voice = line.split('\t')[1:]
+        link = get_id_w_timestamp(link)
         in_use = True if in_use == '' else False
         voice = voice.strip()
         if voice == 'w_voice':
