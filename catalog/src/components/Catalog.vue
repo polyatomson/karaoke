@@ -22,8 +22,11 @@
                     </IconField>
                 </div>
             </template>
-
-
+                <Column style="max-width: 10rem;" frozen alignFrozen="left">
+                    <template #body="{ data }">
+                        <Button :icon="favoriteFill(data)" size="small" severity="error" @click="Like(data)"/>
+                    </template>
+                </Column>
 
                 <Column v-if="!mobile" field="origin" style="max-width: 10rem;" header="Origin" sortable>
                     <template #body="{ data, field }">
@@ -53,11 +56,6 @@
                         <i v-if="data[field]===1" class="pi pi-check" style="font-size: 1rem"></i>
                         <i v-if="data[field]===0" class="pi pi-times" style="font-size: 1rem"></i>
                         </template>
-                </Column>
-                <Column style="max-width: 10rem;" frozen alignFrozen="right">
-                <template #body="{ data }">
-                    <Button :icon="favoriteFill(data)" size="small" severity="error" @click="Like(data)"/>
-                </template>
                 </Column>
                 <Column field="link" style="max-width: 10rem;" frozen alignFrozen="right" header="Link">
                 <template #body="{ data, field }">
