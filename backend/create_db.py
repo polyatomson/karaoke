@@ -1,6 +1,6 @@
 import mysql.connector
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Optional
 import os
 import re
@@ -96,16 +96,18 @@ def create_schema():
     print()
 
 def fill_db(data: list[Song]):
+    # data = [asdict(song) for song in data]
     data = [song.to_tuple() for song in data]
     insert_query = """
     INSERT INTO Songs(song_id, title, artist, vocals, in_use, origin, link) 
     VALUES(%s, %s, %s, %s, %s, %s, %s)
-    ON DUPLICATE KEY UPDATE song_id=song_id;
+    ON DUPLICATE KEY UPDATE 
+    title=VALUES(title), artist=VALUES(artist), vocals=VALUES(vocals), in_use=VALUES(in_use), origin=VALUES(origin);
     """
     conn = mysql.connector.connect(**config)
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(song_id) FROM Songs")
-    n_songs_before= cursor.fetchone()[0]
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(song_id) as n FROM Songs")
+    n_songs_before= cursor.fetchone()['n']
     try:
         cursor.executemany(insert_query, data)
         conn.commit()
@@ -114,8 +116,8 @@ def fill_db(data: list[Song]):
             print('some duplicates prevented batch fill\n', ex.msg)
         else:
             raise(ex)
-    cursor.execute("SELECT COUNT(song_id) FROM Songs")
-    n_songs_after= cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(song_id) as n FROM Songs")
+    n_songs_after= cursor.fetchone()['n']
     conn.close()
     print('DB extended by', n_songs_after-n_songs_before, 'songs')
     print()
