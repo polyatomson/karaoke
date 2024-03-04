@@ -59,7 +59,7 @@
                 </Column>
                 <Column field="link" style="max-width: 10rem;" frozen alignFrozen="right" header="Link">
                 <template #body="{ data, field }">
-                <a :href="data[field]" target="_blank" rel="noopener noreferrer">
+                <a :href="'https://www.youtube.com/watch?v='+data[field]" target="_blank" rel="noopener noreferrer">
                     <Button v-if="mobile" icon="pi pi-external-link" size="small" :severity="visitedColor(data)" @click="addView(data.song_id)"/>
                     <Button v-else label="Open" class="text-sm" icon="pi pi-external-link" size="small" :severity="visitedColor(data)" @click="addView(data.song_id)"/>
                 </a>
