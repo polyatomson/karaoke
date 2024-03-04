@@ -3,3 +3,4 @@ backend/.myenv
 *.pyc
 .htaccess
 commands
+backend/backups
