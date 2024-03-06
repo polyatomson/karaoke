@@ -4,3 +4,4 @@ backend/.myenv
 .htaccess
 commands
 backend/backups
+backend/.config

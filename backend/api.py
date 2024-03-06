@@ -16,11 +16,15 @@ def send_view_to_db():
         song_id = request.get_json()["song_id"]
         return record_view(song_id)
     
-@app.route('/create_tables_and_fill_db', methods=['GET'])
-def create_tables_and_fill_db():
+@app.route('/create_tables_and_fill_db_from_file', methods=['GET'])
+def create_from_file():
     if request.method=='GET':
-        create_db.main()
-        return 'db created'
+        return create_db.create_and_fill_from_file()
+
+@app.route('/create_tables_and_fill_db_from_google', methods=['GET'])
+def create_from_google():
+    if request.method=='GET':
+        return create_db.create_and_fill_from_google()
 
 @app.after_request
 def add_headers(response):

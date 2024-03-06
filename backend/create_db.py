@@ -6,6 +6,7 @@ import os
 import re
 
 from yt_url_parser import get_id_w_timestamp
+import read_google_sheet
 
 @dataclass
 class Song:
@@ -36,14 +37,17 @@ config = {'user': os.environ['DB_USER'],
   'raise_on_warnings': True
 }
 
-def import_sheet(fp: str='backend/google_sheet.tsv') -> list[Song]:
+def import_sheet_from_file(fp: str='google_sheet.tsv') -> list[list]:
     with open(fp, 'r', encoding='utf-8') as f:
         sheet = f.readlines()[1:]
+    sheet = [[value.strip() for value in line.split('\t')] for line in sheet]
+    return sheet
+    
+def process_sheet(sheet: list[list]) -> list[Song]:
     songs: list[Song]
     songs = list()
     for line in sheet:
-        
-        artist, song, link, origin, in_use, voice = line.split('\t')[1:]
+        artist, song, link, origin, in_use, voice = line[1:]
         link = get_id_w_timestamp(link)
         in_use = True if in_use == '' else False
         voice = voice.strip()
@@ -55,6 +59,7 @@ def import_sheet(fp: str='backend/google_sheet.tsv') -> list[Song]:
             voice = None
         songs.append(Song(song=song, artist=artist, link=link, origin=origin, in_use=in_use, voice=voice, id=None))
     return songs
+
 
 def create_schema():
     conn = mysql.connector.connect(**config)
@@ -122,17 +127,29 @@ def fill_db(data: list[Song]):
     cursor.execute("SELECT COUNT(song_id) as n FROM Songs")
     n_songs_after= cursor.fetchone()['n']
     conn.close()
-    print('DB extended by', n_songs_after-n_songs_before, 'songs')
-    print()
+    emptybefore = 'Empty DB filled with ' if n_songs_before==0 else 'Existing DB extended by '
+    msg = emptybefore + str(n_songs_after-n_songs_before) + ' songs'
+    print(msg)
+    return msg
 
 
 
 
-def main():
-    data = import_sheet()
+def create_and_fill_from_file():
+    sheet = import_sheet_from_file()
+    data = process_sheet(sheet)
     create_schema()
-    fill_db(data)
+    return fill_db(data)
 
+def create_and_fill_from_google():
+    sheet = read_google_sheet.read('Karaoke seznam')
+    data = process_sheet(sheet)
+    create_schema()
+    return fill_db(data)
 
 if __name__ == '__main__':
-    main()
+    source = input('From file or google? (f/g) ')
+    if source == 'f':
+        create_and_fill_from_file()
+    elif source == 'g':
+        create_and_fill_from_google()
