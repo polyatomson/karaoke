@@ -14,19 +14,30 @@ def get_table() -> dict:
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""SELECT * FROM Songs 
                    WHERE in_use=1 
-                   ORDER BY origin, artist, title ASC
+                   ORDER BY artist, title ASC;
                    """)
     songs = cursor.fetchall()
     conn.close()
-    return {'songs':songs}
+    
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    cursor.execute("""SELECT t.origin FROM (
+                      SELECT origin, COUNT(song_id) as n_songs FROM Songs
+                      WHERE in_use=1
+                      GROUP BY origin) t
+                      ORDER BY n_songs DESC;""")
+    origins = cursor.fetchall()
+    conn.close()
+    origins = [orig[0] for orig in origins]
+    return {'songs':songs, 'origins': origins}
 
 def record_view(song_id: int) -> str:
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     cursor.execute("""INSERT INTO Views(song_id, n_views) VALUES(%s, 1)
-                   ON DUPLICATE KEY UPDATE n_views = n_views+1""", (song_id,))
+                   ON DUPLICATE KEY UPDATE n_views = n_views+1;""", (song_id,))
     conn.commit()
-    cursor.execute("""SELECT n_views FROM Views WHERE song_id=%s""", (song_id, ))
+    cursor.execute("""SELECT n_views FROM Views WHERE song_id=%s;""", (song_id, ))
     n_views = cursor.fetchone()[0]
     conn.close()
     return f'view recorded, {n_views} total'

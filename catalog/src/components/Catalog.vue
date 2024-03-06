@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-content-center">
         <!-- <Button label="Reload" @click="getCatalog"/> -->
-        <SelectButton v-if="mobile" v-model="selectedOrigin" :options="origins" :allowEmpty="false"/>
+        <Dropdown v-if="mobile" v-model="selectedOrigin" :options="origins" />
     </div>
     <Card style="margin: auto; margin-top: 1rem;" class="pd-card" :pt="{header: {class: 'bg-primary'}, content: {class: 'text-sm'}}">
         <template #header>
@@ -36,7 +36,7 @@
                         <Dropdown v-model="filterModel.value" 
                         @change="filterCallback()"
                         :options="origins"
-                        class="p-column-filter" style="min-width: 12rem"
+                        class="p-column-filter" style="min-width: 3rem"
                         placeholder="Choose"
                         />
                     </template>
@@ -110,7 +110,7 @@ const visitedColor = (data) => {
     }
 }
 
-const origins = ref(['SLO', 'EX-YU', 'Foreign'])
+const origins = ref()
 const selectedOrigin = ref('SLO')
 const songsFromOrigin = ref()
 
@@ -137,17 +137,17 @@ const pickOrigin = (pickedOrigin) => {
 
 const getColor = (origin) => {
     switch (origin) {
-        case 'Forein':
-            return 'danger';
+        case 'EN':
+            return 'warning';
 
         case 'SLO':
             return 'success';
 
         case 'EX-YU':
             return 'info';
-
-        case 'RU':
-            return 'warning';
+        
+        default: 
+            return 'danger'
     }
 }
 
@@ -165,6 +165,7 @@ async function getCatalog() {
           })
     const received = await response.json();
     songs.value = received.songs;
+    origins.value = received.origins;
     console.log('songs recieved, example:', received.songs[0])
 }
 
