@@ -1,7 +1,11 @@
 import gspread
+import os
+import json
 
 def read(sheet_name: str) -> list[list]:
-    gc = gspread.service_account('.config/gspread/service_account.json')
+    
+    credentials = json.loads(os.environ['GOOGLE_INFO'])
+    gc = gspread.service_account_from_dict(credentials)
 
     sh = gc.open(sheet_name)
     worksheet = sh.worksheet('seznam')
