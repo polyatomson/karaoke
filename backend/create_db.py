@@ -6,7 +6,7 @@ import os
 import re
 
 from yt_url_parser import get_id_w_timestamp
-import read_google_sheet
+import operations_w_google_sheet
 
 @dataclass
 class Song:
@@ -47,7 +47,7 @@ def process_sheet(sheet: list[list]) -> list[Song]:
     songs: list[Song]
     songs = list()
     for line in sheet:
-        artist, song, link, origin, in_use, voice = line[1:]
+        artist, song, link, origin, in_use, voice = line[1:7]
         link = get_id_w_timestamp(link)
         in_use = True if in_use == '' else False
         voice = voice.strip()

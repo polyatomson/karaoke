@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+from yt_url_parser import get_id_w_timestamp
 
 config = {'user': os.environ['DB_USER'],
   'password': os.environ['DB_PASSWORD'],
@@ -41,8 +42,29 @@ def record_view(song_id: int) -> str:
     n_views = cursor.fetchone()[0]
     conn.close()
     return f'view recorded, {n_views} total'
-    
-# res = get_table()
+
+def get_views(song_id: int) -> list[list]:
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    cursor.execute("""SELECT n_views FROM Views WHERE song_id=%s;""", (song_id, ))
+    n_views = cursor.fetchone()
+    if n_views is None:
+        return 0
+    return n_views[0]
+
+def get_song_id(link: str) -> int:
+    v_id = get_id_w_timestamp(link)
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    cursor.execute("""SELECT song_id FROM Songs
+                      WHERE link=%s
+                   """, (v_id, ))
+    song_id = cursor.fetchone()
+    if song_id is None:
+        return None
+    return song_id[0]
+
+# res = get_song_id('http://www.youtube.com/watch?v=OzmFgCQftmc')
 # print()
 # {'song_id': 13, 'title': 'Ne moren bez nje', 'artist': 'Alen Vitasović', 'vocals': None, 'in_use': 1, 'origin': 'EX-YU', 'link': 'https://www.youtube....YPTH9IxqpY'}
 # record_view(1)
