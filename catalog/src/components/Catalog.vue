@@ -23,13 +23,17 @@
                     </IconField>
                 </div>
             </template>
-                <Column header="Liked" field="liked" sortable style="max-width: 10rem;" frozen alignFrozen="left">
+                <Column field="liked" sortable style="max-width: 4rem;" frozen alignFrozen="left">
                     <template #body="{ data }">
                         <Button :icon="favoriteFill(data)" size="small" severity="error" @click="Like(data)"/>
                     </template>
                 </Column>
 
-                <Column v-if="!mobile" field="origin" :showFilterMenu="false" style="max-width: 5rem;" header="Language" sortable>
+                <Column v-if="!mobile" field="origin" 
+                :showFilterMenu="false"
+                 style="max-width: 4rem;" header="Lang" sortable
+                 
+                  >
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
