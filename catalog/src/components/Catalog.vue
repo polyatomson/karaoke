@@ -10,6 +10,7 @@
         <template #content>
             <DataTable :value="songsFromOrigin" size="small" scrollable :scrollHeight="scrollH"
             sortMode="multiple" v-model:filters="filters" 
+            removableSort
             filterDisplay="row"
             :globalFilterFields="['artist', 'title']"
             >
@@ -22,13 +23,13 @@
                     </IconField>
                 </div>
             </template>
-                <Column style="max-width: 10rem;" frozen alignFrozen="left">
+                <Column header="Liked" field="liked" sortable style="max-width: 10rem;" frozen alignFrozen="left">
                     <template #body="{ data }">
                         <Button :icon="favoriteFill(data)" size="small" severity="error" @click="Like(data)"/>
                     </template>
                 </Column>
 
-                <Column v-if="!mobile" field="origin" style="max-width: 10rem;" header="Origin" sortable>
+                <Column v-if="!mobile" field="origin" :showFilterMenu="false" style="max-width: 5rem;" header="Language" sortable>
                     <template #body="{ data, field }">
                         <Tag :value="data[field]" :severity="getColor(data[field])" />
                     </template>
@@ -36,8 +37,7 @@
                         <Dropdown v-model="filterModel.value" 
                         @change="filterCallback()"
                         :options="origins"
-                        class="p-column-filter" style="min-width: 3rem"
-                        placeholder="Choose"
+                        class="" style="min-width: 3rem"
                         />
                     </template>
                 </Column>
@@ -84,9 +84,11 @@ const favs = ref()
 
 const favoriteFill = (data) => {
     if (favs.value.includes(data.song_id)) {
+        data.liked = 1
         return 'pi pi-heart-fill'
     }
     else {
+        data.liked = 0
         return 'pi pi-heart'
     }
 }
@@ -95,9 +97,11 @@ const Like = (data) => {
     const song_id = data.song_id
     if (favs.value.includes(song_id)) {
         favs.value = favs.value.filter((id) => id !== song_id)
+        data.liked = 0
     }
     else {
         favs.value.push(song_id)
+        data.liked = 1
     }
 }
 
