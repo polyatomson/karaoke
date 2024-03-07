@@ -84,11 +84,11 @@ const favs = ref()
 
 const favoriteFill = (data) => {
     if (favs.value.includes(data.song_id)) {
-        data.liked = 1
+        data.liked = 0
         return 'pi pi-heart-fill'
     }
     else {
-        data.liked = 0
+        data.liked = 1
         return 'pi pi-heart'
     }
 }
@@ -97,11 +97,11 @@ const Like = (data) => {
     const song_id = data.song_id
     if (favs.value.includes(song_id)) {
         favs.value = favs.value.filter((id) => id !== song_id)
-        data.liked = 0
+        data.liked = 1
     }
     else {
         favs.value.push(song_id)
-        data.liked = 1
+        data.liked = 0
     }
 }
 
