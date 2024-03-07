@@ -19,9 +19,9 @@ class Song:
     id: Optional[int]
     views: int = 0
 
-    def to_tuple(self) -> tuple:
+    def to_tuple_no_id(self) -> tuple:
         # song_id, title, artist, vocals, in_use, origin, link
-        return self.id, self.song, self.artist, self.voice, self.in_use, self.origin, self.link
+        return self.song, self.artist, self.voice, self.in_use, self.origin, self.link
     
     # def clean_link(self) -> None:
     #     if 'watch?v=' in self.link:
@@ -105,30 +105,40 @@ def create_schema():
 
 def fill_db(data: list[Song]):
     # data = [asdict(song) for song in data]
-    data = [song.to_tuple() for song in data]
+    data = [song.to_tuple_no_id() for song in data]
+    update_query = """
+            UPDATE Songs SET title=%s, artist=%s, vocals=%s, in_use=%s, origin=%s
+            WHERE link=%s
+            """
     insert_query = """
-    INSERT INTO Songs(song_id, title, artist, vocals, in_use, origin, link) 
-    VALUES(%s, %s, %s, %s, %s, %s, %s)
-    ON DUPLICATE KEY UPDATE 
-    title=VALUES(title), artist=VALUES(artist), vocals=VALUES(vocals), in_use=VALUES(in_use), origin=VALUES(origin);
+    INSERT INTO Songs(title, artist, vocals, in_use, origin, link) 
+    VALUES(%s, %s, %s, %s, %s, %s)
+    ON DUPLICATE KEY UPDATE song_id=song_id;
     """
+    #update
     conn = mysql.connector.connect(**config)
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT COUNT(song_id) as n FROM Songs")
-    n_songs_before= cursor.fetchone()['n']
-    try:
-        cursor.executemany(insert_query, data)
-        conn.commit()
-    except Exception as ex:
-        if ex.errno == 1062:
-            print('some duplicates prevented batch fill\n', ex.msg)
-        else:
-            raise(ex)
-    cursor.execute("SELECT COUNT(song_id) as n FROM Songs")
-    n_songs_after= cursor.fetchone()['n']
+    cursor = conn.cursor()
+    cursor.executemany(update_query, data)
+    conn.commit()
+    n_updated = cursor.rowcount
     conn.close()
-    emptybefore = 'Empty DB filled with ' if n_songs_before==0 else 'Existing DB extended by '
-    msg = emptybefore + str(n_songs_after-n_songs_before) + ' songs'
+
+    #insertion
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(song_id) as n FROM Songs")
+    n_songs_before = cursor.fetchone()[0]
+    
+    cursor.executemany(insert_query, data)
+    conn.commit()
+    n_inserted = cursor.rowcount
+    conn.close()
+
+    emptybefore = 'Empty DB filled with' if n_songs_before==0 else 'Existing DB extended by'
+    msg = f"""{emptybefore} {str(n_inserted)} songs.\n
+                Total count is {str(n_songs_before+n_inserted)}.\n
+                {str(n_updated)} rows were updated."""
     print(msg)
     return msg
 
@@ -142,7 +152,7 @@ def create_and_fill_from_file():
     return fill_db(data)
 
 def create_and_fill_from_google():
-    sheet = read_google_sheet.read('Karaoke seznam')
+    sheet = operations_w_google_sheet.read('Karaoke seznam')
     data = process_sheet(sheet)
     create_schema()
     return fill_db(data)

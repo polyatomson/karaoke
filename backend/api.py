@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 from operations_w_db import get_table, record_view
+from operations_w_google_sheet import write_views
 import create_db
 
 app = Flask(__name__)
@@ -25,6 +26,11 @@ def create_from_file():
 def create_from_google():
     if request.method=='GET':
         return create_db.create_and_fill_from_google()
+
+@app.route('export_to_google_sheets', methods=['GET'])
+def export_to_google():
+    if request.method == 'GET':
+        return write_views('Karaoke seznam')
 
 @app.after_request
 def add_headers(response):
