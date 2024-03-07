@@ -27,7 +27,7 @@ def create_from_google():
     if request.method=='GET':
         return create_db.create_and_fill_from_google()
 
-@app.route('export_to_google_sheets', methods=['GET'])
+@app.route('/export_to_google_sheets', methods=['GET'])
 def export_to_google():
     if request.method == 'GET':
         return write_views('Karaoke seznam')
